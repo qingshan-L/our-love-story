@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="属于我们的爱情故事：纪念日倒计时与一路走来的每个瞬间。" />
+  <meta name="theme-color" content="#ffe9f2" />
+  <meta name="color-scheme" content="light" />
+  <title>我们的故事 · 情侣纪念日</title>
+
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <noscript><style>.reveal { opacity: 1; transform: none; }</style></noscript>
+</head>
+<body>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- 导航 -->
+  <header class="site-header" id="siteHeader">
+    <a class="brand" href="#home" aria-label="回到首页">
+      <span class="brand-mark" aria-hidden="true">♥</span>
+      <span class="brand-name" id="brandText">我们的故事</span>
+    </a>
+    <nav class="site-nav" aria-label="页面导航">
+      <a href="#home" class="nav-link is-active"><small>01</small>首页</a>
+      <a href="#timeline" class="nav-link"><small>02</small>故事</a>
+      <a href="#milestones" class="nav-link"><small>03</small>纪念</a>
+      <!-- 相册暂时隐藏，以后备用时可取消注释：
+      <a href="#album" class="nav-link"><small>04</small>相册</a> -->
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============ 首屏 ============ -->
+    <section class="hero" id="home">
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow reveal"><span class="eyebrow-line" aria-hidden="true"></span><span id="heroEyebrow"></span></p>
+
+          <h1 class="hero-title reveal">
+            <span id="nameA">TA</span>
+            <span class="amp" aria-hidden="true">&amp;</span>
+            <span id="nameB">我</span>
+          </h1>
+
+          <p class="hero-script reveal" id="heroScript">我们的小宇宙</p>
+
+          <p class="hero-subtitle reveal" id="heroSubtitle"></p>
+        </div>
+
+        <!-- 数字面板 -->
+        <div class="stat-panel reveal">
+          <div class="panel-top">
+            <span class="micro-label" id="daysLabel">在一起的日子</span>
+            <span class="panel-since" id="startDateLabel">自 — 起</span>
+          </div>
+
+          <div class="stat-figure">
+            <strong id="daysTogether">0</strong>
+            <span id="daysCaption">天</span>
+          </div>
+          <p class="stat-caption" id="statCaption">我们已经一起走过</p>
+
+          <div class="panel-rule" aria-hidden="true"></div>
+
+          <div class="countdown" aria-live="polite">
+            <span class="micro-label" id="countdownLabel">距离下一个纪念日</span>
+            <div class="countdown-row">
+              <div class="countdown-item">
+                <span class="countdown-value" id="cdDays">00</span>
+                <span class="countdown-unit">天</span>
+              </div>
+              <div class="countdown-item">
+                <span class="countdown-value" id="cdHours">00</span>
+                <span class="countdown-unit">时</span>
+              </div>
+              <div class="countdown-item">
+                <span class="countdown-value" id="cdMinutes">00</span>
+                <span class="countdown-unit">分</span>
+              </div>
+              <div class="countdown-item">
+                <span class="countdown-value" id="cdSeconds">00</span>
+                <span class="countdown-unit">秒</span>
+              </div>
+            </div>
+            <p class="countdown-note"><span id="anniversaryLabel">下一个纪念日</span> · <span id="anniversaryDate"></span></p>
+          </div>
+        </div>
+      </div>
+
+      <a class="hero-foot reveal" href="#timeline" aria-label="向下翻阅我们的故事">
+        <span>向下翻阅</span>
+        <span class="hero-foot-line" aria-hidden="true"></span>
+        <span class="hero-foot-arrow" aria-hidden="true">↓</span>
+      </a>
+    </section>
+
+    <!-- ============ 引言带 ============ -->
+    <section class="quote-band">
+      <div class="quote-inner reveal">
+        <span class="quote-mark" aria-hidden="true">“</span>
+        <blockquote id="heroQuote"></blockquote>
+        <span class="quote-by" id="quoteBy"></span>
+      </div>
+    </section>
+
+    <!-- ============ 故事 ============ -->
+    <section class="section timeline-section" id="timeline">
+      <div class="section-head reveal">
+        <div class="section-head-main">
+          <p class="micro-label" id="timelineKicker"></p>
+          <h2 class="section-title" id="timelineTitle"></h2>
+        </div>
+        <p class="section-desc" id="timelineDesc"></p>
+      </div>
+
+      <div class="story-grid" id="timelineList"></div>
+
+      <p class="timeline-ending reveal" id="timelineEnding"></p>
+    </section>
+
+    <!-- ============ 里程碑 & 分享 ============ -->
+    <section class="section milestone-section" id="milestones">
+      <div class="section-head reveal">
+        <div class="section-head-main">
+          <p class="micro-label" id="milestoneKicker"></p>
+          <h2 class="section-title" id="milestoneTitle"></h2>
+        </div>
+        <p class="section-desc" id="milestoneDesc"></p>
+      </div>
+
+      <div class="milestone-next reveal" id="milestoneNext"></div>
+      <div class="milestone-grid" id="milestoneGrid"></div>
+
+      <div class="share-panel reveal">
+        <div class="share-copy">
+          <p class="share-kicker" id="shareKicker"></p>
+          <h3 class="share-title" id="shareTitle"></h3>
+          <p class="share-desc" id="shareDesc"></p>
+        </div>
+        <div class="share-actions">
+          <button class="action-btn" id="copyBtn" type="button">
+            <span class="action-icon" aria-hidden="true">⧉</span>
+            <span class="action-label" id="copyLabel">复制爱情总结</span>
+          </button>
+          <button class="action-btn is-primary" id="downloadBtn" type="button">
+            <span class="action-icon" aria-hidden="true">↓</span>
+            <span class="action-label" id="downloadLabel">下载纪念卡片</span>
+          </button>
+        </div>
+      </div>
+      <p class="action-feedback" id="actionFeedback" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- ============ 相册：暂时隐藏，以后备用 ============ -->
+    <!-- 需要展示时：删除下面 <section> 的 hidden 属性，并恢复导航中的「相册」链接 -->
+    <section class="section album-section" id="album" hidden>
+      <div class="section-head reveal">
+        <div class="section-head-main">
+          <p class="micro-label" id="albumKicker"></p>
+          <h2 class="section-title" id="albumTitle"></h2>
+        </div>
+        <p class="section-desc" id="albumDesc"></p>
+      </div>
+      <div class="album-grid" id="albumGrid"></div>
+      <p class="album-hint" id="albumHint">点击照片可放大查看，左右方向键切换</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <p class="footer-line" id="footerLine"></p>
+        <p class="footer-sub" id="footerSub"></p>
+      </div>
+      <a class="back-top" href="#home">回到顶部 <span aria-hidden="true">↑</span></a>
+    </div>
+  </footer>
+
+  <!-- 悬浮回到顶部：滚动后出现，移动端与桌面端都保持 48px 点击区域 -->
+  <button class="to-top" id="toTop" type="button" aria-label="回到顶部">
+    <span aria-hidden="true">↑</span>
+  </button>
+
+  <!-- 相册灯箱（随相册一起备用） -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="照片查看器" hidden>
+    <button class="lightbox-close" id="lightboxClose" aria-label="关闭">×</button>
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="上一张">‹</button>
+    <figure class="lightbox-figure">
+      <img id="lightboxImage" src="" alt="" />
+      <figcaption id="lightboxCaption"></figcaption>
+    </figure>
+    <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="下一张">›</button>
+    <div class="lightbox-counter" id="lightboxCounter"></div>
+  </div>
+
+  <script src="js/data.js" defer></script>
+  <script src="js/script.js" defer></script>
+</body>
+</html>

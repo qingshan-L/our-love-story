@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="照片占位图 3">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e6d6ec"/>
+      <stop offset="1" stop-color="#f6ecf3"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="150" cy="130" r="160" fill="#ffffff" opacity="0.2"/>
+  <circle cx="660" cy="520" r="210" fill="#ffffff" opacity="0.13"/>
+  <g fill="none" stroke="#ffffff" stroke-width="3" opacity="0.85">
+    <circle cx="400" cy="290" r="120" stroke-dasharray="6 12"/>
+    <path d="M400 250c-18-30-62-34-84-8-25 30-4 74 84 132 88-58 109-102 84-132-22-26-66-22-84 8z" fill="#ffffff" fill-opacity="0.3"/>
+  </g>
+  <g fill="#ffffff" opacity="0.7">
+    <path d="M170 430c-7-12-24-13-32-3-9 11-1 28 32 50 33-22 41-39 32-50-8-10-25-9-32 3z"/>
+    <path d="M640 180c-6-10-21-11-28-2-8 10-1 25 28 44 29-19 36-34 28-44-7-9-22-8-28 2z"/>
+  </g>
+  <text x="400" y="470" text-anchor="middle" font-family="Georgia, 'Microsoft YaHei', serif" font-size="34" letter-spacing="6" fill="#7d5a86" opacity="0.8">PHOTO 03</text>
+  <text x="400" y="512" text-anchor="middle" font-family="'Microsoft YaHei', serif" font-size="20" letter-spacing="4" fill="#7d5a86" opacity="0.65">在这里替换成我们的照片</text>
+</svg>
