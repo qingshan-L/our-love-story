@@ -270,6 +270,44 @@
       .sort((a, b) => a.target - b.target);
   }
 
+  /** 只展示距离今天最近的几个节点，并确保「下一个里程碑」一定在列 */
+  function pickNearestMilestones(milestones, next, count) {
+    if (milestones.length <= count) return milestones;
+
+    const today = startOfDay(new Date());
+    const ranked = milestones
+      .slice()
+      .sort((a, b) => Math.abs(a.target - today) - Math.abs(b.target - today))
+      .slice(0, count);
+
+    if (next && ranked.indexOf(next) === -1) {
+      ranked.pop();
+      ranked.push(next);
+    }
+
+    return ranked.sort((a, b) => a.target - b.target);
+  }
+
+  /**
+   * 页面展示用的里程碑快照
+   * 页面上只显示最近 3 个节点，因此「已解锁 n / 3」也按这 3 个统计，
+   * 复制文案与分享卡片复用同一份数据，保证三处数字一致。
+   */
+  function getMilestoneView(now) {
+    const all = getMilestones(now);
+    if (!all.length) return { all: [], visible: [], doneInView: 0, next: null };
+
+    const next = all.find((item) => !item.achieved) || null;
+    const visible = pickNearestMilestones(all, next, 3);
+
+    return {
+      all,
+      visible,
+      doneInView: visible.filter((item) => item.achieved).length,
+      next,
+    };
+  }
+
   function renderMilestones() {
     const milestonesConfig = config.milestones || {};
     setText("#milestoneKicker", milestonesConfig.kicker);
@@ -281,22 +319,27 @@
     setText("#shareTitle", share.title);
     setText("#shareDesc", share.desc);
     if (share.copyLabel) setText("#copyLabel", share.copyLabel);
+    if (share.previewLabel) setText("#previewLabel", share.previewLabel);
     if (share.downloadLabel) setText("#downloadLabel", share.downloadLabel);
+    if (share.previewHint) setText("#cardPreviewHint", share.previewHint);
 
     const grid = $("#milestoneGrid");
     const nextBox = $("#milestoneNext");
     if (!grid || !nextBox) return;
 
-    const milestones = getMilestones();
-    if (!milestones.length) {
+    const view = getMilestoneView();
+    const allMilestones = view.all;
+    if (!allMilestones.length) {
       grid.innerHTML = "";
       nextBox.innerHTML =
         '<p class="milestone-next-note">填写起始日期后，这里会自动计算你们的里程碑。</p>';
       return;
     }
 
-    const doneCount = milestones.filter((item) => item.achieved).length;
-    const next = milestones.find((item) => !item.achieved);
+    // 与页面卡片保持一致：只统计展示出来的这几个节点
+    const doneCount = view.doneInView;
+    const next = view.next;
+    const visible = view.visible;
 
     if (!next) {
       nextBox.innerHTML = `
@@ -305,7 +348,7 @@
             <span class="micro-label">里程碑进度</span>
             <p class="milestone-next-name">全部解锁 🎉</p>
           </div>
-          <span class="milestone-next-days">${doneCount} / ${milestones.length}</span>
+          <span class="milestone-next-days">${doneCount} / ${visible.length}</span>
         </div>
         <div class="milestone-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
           <span style="width: 100%"></span>
@@ -325,10 +368,10 @@
         <div class="milestone-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}" aria-label="距离下一个里程碑的进度">
           <span style="width: ${percent}%"></span>
         </div>
-        <p class="milestone-next-note">已解锁 ${doneCount} / ${milestones.length} 个里程碑 · 目标日期 ${formatDate(next.target)}</p>`;
+        <p class="milestone-next-note">已解锁 ${doneCount} / ${visible.length} 个里程碑 · 目标日期 ${formatDate(next.target)}</p>`;
     }
 
-    grid.innerHTML = milestones
+    grid.innerHTML = visible
       .map((item, index) => {
         const classes = ["milestone-card", "reveal"];
         if (item.achieved) classes.push("is-done");
@@ -383,9 +426,8 @@
     const now = new Date();
     const days = getDaysTogether(now);
     const anniversary = getNextAnniversary();
-    const milestones = getMilestones(now);
-    const doneCount = milestones.filter((item) => item.achieved).length;
-    const next = milestones.find((item) => !item.achieved);
+    const milestoneView = getMilestoneView(now);
+    const next = milestoneView.next;
     const lines = [];
 
     lines.push("💗 我们的爱情总结 💗");
@@ -403,8 +445,10 @@
       );
     }
 
-    if (milestones.length) {
-      lines.push(`🏅 已解锁里程碑 ${doneCount} / ${milestones.length}`);
+    if (milestoneView.all.length) {
+      lines.push(
+        `🏅 已解锁里程碑 ${milestoneView.doneInView} / ${milestoneView.visible.length}`
+      );
       if (next) {
         const remainingText = next.remaining > 0 ? `还有 ${next.remaining} 天` : "今天达成";
         lines.push(`🎯 下一个：${next.label}，${remainingText}`);
@@ -500,9 +544,8 @@
     const days = getDaysTogether(now);
     const anniversary = getNextAnniversary();
     const countdown = anniversary ? getCountdownParts(anniversary.target, now) : null;
-    const milestones = getMilestones(now);
-    const doneCount = milestones.filter((item) => item.achieved).length;
-    const nextMilestone = milestones.find((item) => !item.achieved);
+    const milestoneView = getMilestoneView(now);
+    const nextMilestone = milestoneView.next;
 
     const W = 1080;
     const H = 1350;
@@ -679,10 +722,14 @@
     ctx.stroke();
 
     // 里程碑
-    if (milestones.length) {
+    if (milestoneView.all.length) {
       ctx.fillStyle = INK;
       ctx.font = `500 32px ${SANS}`;
-      ctx.fillText(`已解锁里程碑 ${doneCount} / ${milestones.length}`, center, 1052);
+      ctx.fillText(
+        `已解锁里程碑 ${milestoneView.doneInView} / ${milestoneView.visible.length}`,
+        center,
+        1052
+      );
 
       ctx.fillStyle = ACCENT;
       ctx.font = `500 28px ${SANS}`;
@@ -711,6 +758,11 @@
     return canvas;
   }
 
+  function buildCardFilename() {
+    const now = new Date();
+    return `our-story-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}.png`;
+  }
+
   function triggerDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -722,9 +774,193 @@
     setTimeout(() => URL.revokeObjectURL(url), 4000);
   }
 
+  /* ==========================================================
+   * 卡片预览
+   * ========================================================== */
+  let previewUrl = "";
+  let previewOpener = null;
+  let previewCloseTimer = null;
+
+  function releasePreviewUrl() {
+    if (previewUrl && previewUrl.indexOf("blob:") === 0) URL.revokeObjectURL(previewUrl);
+    previewUrl = "";
+  }
+
+  function canvasToImageUrl(canvas) {
+    return new Promise((resolve, reject) => {
+      if (!canvas.toBlob) {
+        try {
+          releasePreviewUrl();
+          previewUrl = canvas.toDataURL("image/png");
+          resolve(previewUrl);
+        } catch (error) {
+          reject(error);
+        }
+        return;
+      }
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error("toBlob failed"));
+          return;
+        }
+        releasePreviewUrl();
+        previewUrl = URL.createObjectURL(blob);
+        resolve(previewUrl);
+      }, "image/png");
+    });
+  }
+
+  function openCardPreview() {
+    const dialog = $("#cardPreview");
+    const image = $("#cardPreviewImage");
+    if (!dialog || !image) return;
+
+    const button = $("#previewBtn");
+    const label = $("#previewLabel");
+    const original = label ? label.textContent : "";
+
+    previewOpener = document.activeElement;
+    if (button) button.disabled = true;
+    if (label) label.textContent = "正在生成…";
+
+    const restoreButton = () => {
+      if (label) label.textContent = original;
+      if (button) button.disabled = false;
+    };
+
+    let canvas;
+    try {
+      canvas = drawShareCard();
+    } catch (error) {
+      console.error("生成卡片预览失败：", error);
+      showFeedback("卡片生成失败，请稍后重试。", "error");
+      restoreButton();
+      return;
+    }
+
+    canvasToImageUrl(canvas)
+      .then((url) => {
+        image.src = url;
+        clearTimeout(previewCloseTimer);
+        dialog.classList.remove("is-open");
+        dialog.hidden = false;
+        document.body.classList.add("no-scroll");
+        requestAnimationFrame(() => dialog.classList.add("is-open"));
+        const close = $("#cardPreviewClose");
+        if (close) close.focus();
+      })
+      .catch((error) => {
+        console.error("生成卡片预览失败：", error);
+        showFeedback("卡片生成失败，请稍后重试。", "error");
+      })
+      .then(restoreButton);
+  }
+
+  function closeCardPreview() {
+    const dialog = $("#cardPreview");
+    if (!dialog || dialog.hidden) return;
+
+    dialog.classList.remove("is-open");
+    document.body.classList.remove("no-scroll");
+
+    const finish = () => {
+      dialog.hidden = true;
+      const image = $("#cardPreviewImage");
+      if (image) image.removeAttribute("src");
+      releasePreviewUrl();
+      if (previewOpener && typeof previewOpener.focus === "function") previewOpener.focus();
+      previewOpener = null;
+    };
+
+    clearTimeout(previewCloseTimer);
+    if (reduceMotion) finish();
+    else previewCloseTimer = setTimeout(finish, 220);
+  }
+
+  function downloadPreviewCard() {
+    const button = $("#cardPreviewDownload");
+    const label = $("#cardPreviewDownloadLabel");
+    if (!button || button.disabled) return;
+
+    const original = label ? label.textContent : "下载 PNG";
+    const filename = buildCardFilename();
+
+    const resetButton = (delay) => {
+      setTimeout(() => {
+        if (label) label.textContent = original;
+        button.disabled = false;
+      }, delay);
+    };
+
+    const done = () => {
+      if (label) label.textContent = "已保存 ✓";
+      showFeedback("纪念卡片已保存到本地。", "success");
+      resetButton(1800);
+    };
+
+    const fail = () => {
+      if (label) label.textContent = "保存失败";
+      showFeedback("保存失败，请长按或右键图片另存为。", "error");
+      resetButton(2200);
+    };
+
+    button.disabled = true;
+    if (label) label.textContent = "正在保存…";
+
+    try {
+      const canvas = drawShareCard();
+      if (canvas.toBlob) {
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            fail();
+            return;
+          }
+          triggerDownload(blob, filename);
+          done();
+        }, "image/png");
+      } else {
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        done();
+      }
+    } catch (error) {
+      console.error("保存卡片失败：", error);
+      fail();
+    }
+  }
+
   function setupShareActions() {
     const copyBtn = $("#copyBtn");
+    const previewBtn = $("#previewBtn");
     const downloadBtn = $("#downloadBtn");
+    const previewDialog = $("#cardPreview");
+
+    if (previewBtn) previewBtn.addEventListener("click", openCardPreview);
+
+    if (previewDialog) {
+      previewDialog.addEventListener("click", (event) => {
+        if (event.target === previewDialog) closeCardPreview();
+      });
+    }
+
+    const previewClose = $("#cardPreviewClose");
+    if (previewClose) previewClose.addEventListener("click", closeCardPreview);
+
+    const previewDownload = $("#cardPreviewDownload");
+    if (previewDownload) previewDownload.addEventListener("click", downloadPreviewCard);
+
+    document.addEventListener("keydown", (event) => {
+      if (!previewDialog || previewDialog.hidden) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeCardPreview();
+      }
+    });
 
     if (copyBtn) {
       copyBtn.addEventListener("click", () => {
@@ -759,10 +995,7 @@
         if (downloadBtn.disabled) return;
         const label = $("#downloadLabel");
         const original = label.textContent;
-        const now = new Date();
-        const filename = `our-story-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(
-          now.getDate()
-        )}.png`;
+        const filename = buildCardFilename();
 
         const resetButton = (delay) => {
           clearTimeout(downloadResetTimer);
@@ -915,8 +1148,17 @@
     const header = $("#siteHeader");
     const progress = $("#scrollProgress");
     const toTop = $("#toTop");
-    const links = document.querySelectorAll(".nav-link");
-    const sections = document.querySelectorAll("main section[id]:not([hidden])");
+    const links = Array.from(document.querySelectorAll(".nav-link"));
+    const sections = Array.from(document.querySelectorAll("main section[id]:not([hidden])"));
+
+    const setActive = (id) => {
+      links.forEach((link) => {
+        const active = link.getAttribute("href") === `#${id}`;
+        link.classList.toggle("is-active", active);
+        if (active) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+      });
+    };
 
     const onScroll = () => {
       const scrollY = window.scrollY;
@@ -925,21 +1167,36 @@
 
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const ratio = max > 0 ? Math.min(1, scrollY / max) : 0;
-      progress.style.transform = `scaleX(${ratio})`;
+      if (progress) progress.style.transform = `scaleX(${ratio})`;
 
-      let activeId = "home";
+      // 参考线：视口上方 40% 处，区块顶部越过它就算「当前区块」
+      const line = scrollY + window.innerHeight * 0.4;
+      let activeId = sections.length ? sections[0].id : "home";
+
       sections.forEach((section) => {
-        if (scrollY >= section.offsetTop - window.innerHeight * 0.4) {
-          activeId = section.id;
-        }
+        const top = section.getBoundingClientRect().top + scrollY;
+        if (top <= line) activeId = section.id;
       });
-      links.forEach((link) => {
-        link.classList.toggle("is-active", link.getAttribute("href") === `#${activeId}`);
-      });
+
+      // 分享区在页面末尾且较短，可能永远到不了参考线：滚动到底时直接高亮它
+      if (sections.length && max > 0 && scrollY >= max - 2) {
+        activeId = sections[sections.length - 1].id;
+      }
+
+      setActive(activeId);
     };
+
+    // 点击导航先即时高亮，滚动过程中的 onScroll 会再次校正
+    links.forEach((link) => {
+      link.addEventListener("click", () => {
+        const id = (link.getAttribute("href") || "").replace(/^#/, "");
+        if (id) setActive(id);
+      });
+    });
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    window.addEventListener("hashchange", onScroll);
     onScroll();
   }
 

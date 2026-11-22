@@ -23,10 +23,11 @@
     </a>
     <nav class="site-nav" aria-label="页面导航">
       <a href="#home" class="nav-link is-active"><small>01</small>首页</a>
-      <a href="#timeline" class="nav-link"><small>02</small>故事</a>
-      <a href="#milestones" class="nav-link"><small>03</small>纪念</a>
+      <a href="#milestones" class="nav-link"><small>02</small>纪念</a>
+      <a href="#timeline" class="nav-link"><small>03</small>故事</a>
+      <a href="#share" class="nav-link"><small>04</small>分享</a>
       <!-- 相册暂时隐藏，以后备用时可取消注释：
-      <a href="#album" class="nav-link"><small>04</small>相册</a> -->
+      <a href="#album" class="nav-link"><small>05</small>相册</a> -->
     </nav>
   </header>
 
@@ -88,7 +89,7 @@
         </div>
       </div>
 
-      <a class="hero-foot reveal" href="#timeline" aria-label="向下翻阅我们的故事">
+      <a class="hero-foot reveal" href="#milestones" aria-label="向下翻阅我们的纪念">
         <span>向下翻阅</span>
         <span class="hero-foot-line" aria-hidden="true"></span>
         <span class="hero-foot-arrow" aria-hidden="true">↓</span>
@@ -102,6 +103,20 @@
         <blockquote id="heroQuote"></blockquote>
         <span class="quote-by" id="quoteBy"></span>
       </div>
+    </section>
+
+    <!-- ============ 里程碑 ============ -->
+    <section class="section milestone-section" id="milestones">
+      <div class="section-head reveal">
+        <div class="section-head-main">
+          <p class="micro-label" id="milestoneKicker"></p>
+          <h2 class="section-title" id="milestoneTitle"></h2>
+        </div>
+        <p class="section-desc" id="milestoneDesc"></p>
+      </div>
+
+      <div class="milestone-next reveal" id="milestoneNext"></div>
+      <div class="milestone-grid" id="milestoneGrid"></div>
     </section>
 
     <!-- ============ 故事 ============ -->
@@ -119,19 +134,8 @@
       <p class="timeline-ending reveal" id="timelineEnding"></p>
     </section>
 
-    <!-- ============ 里程碑 & 分享 ============ -->
-    <section class="section milestone-section" id="milestones">
-      <div class="section-head reveal">
-        <div class="section-head-main">
-          <p class="micro-label" id="milestoneKicker"></p>
-          <h2 class="section-title" id="milestoneTitle"></h2>
-        </div>
-        <p class="section-desc" id="milestoneDesc"></p>
-      </div>
-
-      <div class="milestone-next reveal" id="milestoneNext"></div>
-      <div class="milestone-grid" id="milestoneGrid"></div>
-
+    <!-- ============ 分享 ============ -->
+    <section class="section share-section" id="share">
       <div class="share-panel reveal">
         <div class="share-copy">
           <p class="share-kicker" id="shareKicker"></p>
@@ -142,6 +146,10 @@
           <button class="action-btn" id="copyBtn" type="button">
             <span class="action-icon" aria-hidden="true">⧉</span>
             <span class="action-label" id="copyLabel">复制爱情总结</span>
+          </button>
+          <button class="action-btn" id="previewBtn" type="button">
+            <span class="action-icon" aria-hidden="true">◉</span>
+            <span class="action-label" id="previewLabel">预览卡片</span>
           </button>
           <button class="action-btn is-primary" id="downloadBtn" type="button">
             <span class="action-icon" aria-hidden="true">↓</span>
@@ -192,6 +200,23 @@
     </figure>
     <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="下一张">›</button>
     <div class="lightbox-counter" id="lightboxCounter"></div>
+  </div>
+
+  <!-- 纪念卡片预览 -->
+  <div class="card-preview" id="cardPreview" role="dialog" aria-modal="true" aria-label="纪念卡片预览" hidden>
+    <button class="card-preview-close" id="cardPreviewClose" type="button" aria-label="关闭预览">×</button>
+    <div class="card-preview-inner">
+      <figure class="card-preview-figure">
+        <img id="cardPreviewImage" src="" alt="纪念卡片预览" />
+      </figure>
+      <div class="card-preview-actions">
+        <p class="card-preview-hint" id="cardPreviewHint">长按或右键图片可保存，也可以直接下载。</p>
+        <button class="action-btn is-primary" id="cardPreviewDownload" type="button">
+          <span class="action-icon" aria-hidden="true">↓</span>
+          <span class="action-label" id="cardPreviewDownloadLabel">下载 PNG</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <script src="js/data.js" defer></script>

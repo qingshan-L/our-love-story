@@ -32,7 +32,7 @@ const SITE_CONFIG = {
 
   // ---------- 时间轴 ----------
   timeline: {
-    kicker: "01 / 时光轴",
+    kicker: "03 / 时光轴",
     title: "每个瞬间，都关于你",
     desc: "时间不说话，却替我们记住了所有重要的时刻。",
     ending: "故事还在继续，下一页留给我们一起写。",
@@ -80,7 +80,7 @@ const SITE_CONFIG = {
   // ---------- 里程碑 ----------
   // type 支持 "days"（天）、"months"（月）、"years"（年）
   milestones: {
-    kicker: "03 / 里程碑",
+    kicker: "02 / 里程碑",
     title: "一起解锁的纪念",
     desc: "从第一个 100 天开始，每个节点都值得被记住。",
     items: [
@@ -99,7 +99,9 @@ const SITE_CONFIG = {
       title: "把我们的故事带在身边",
       desc: "复制一段排版好的文字，或生成一张纪念卡片图片。",
       copyLabel: "复制爱情总结",
+      previewLabel: "预览卡片",
       downloadLabel: "下载纪念卡片",
+      previewHint: "长按或右键图片可保存，也可以直接下载。",
     },
   },
 
