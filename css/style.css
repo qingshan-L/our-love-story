@@ -21,7 +21,11 @@
   --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", serif;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+  /* 去掉移动端点击时的蓝色方块闪烁；键盘焦点样式仍由 :focus-visible 提供 */
+  -webkit-tap-highlight-color: transparent;
+}
 [hidden] { display: none !important; }
 
 html {
